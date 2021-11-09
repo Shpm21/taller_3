@@ -1,0 +1,77 @@
+CREATE TABLE tipo (
+	id int primary key,
+	nombre text not null,
+	fortaleza text not null,
+	debilidad text not null
+)
+
+CREATE TABLE ataque(
+	id_ataque int primary key,
+	tipo int not null,
+	nombre text not null,
+	dano_base int not null,
+	
+ 	foreign key (tipo) references tipo(id)
+)
+
+CREATE TABLE especie(
+	id int primary key,
+	nombre text not null,
+	id_tipo_1 int not null,
+	id_tipo_2 int null,
+	
+	foreign key (id_tipo_1) references tipo(id),
+	foreign key (id_tipo_2) references tipo(id)
+)
+
+CREATE TABLE usuario(
+	nombre_usuario text primary key,
+	nombre text not null,
+	apellido text not null,
+	contrasena text not null,
+	fecha_de_nacimiento date not null,
+	edad int not null
+)
+
+CREATE TABLE creatura(
+	id_creatura int primary key,
+	id_especie int not null,
+	id_ataque_1 int not null,
+	id_ataque_2 int null,
+	nombre_usuario text not null,
+	salud int not null,
+	velocidad int not null,
+	
+	foreign key (id_especie) references especie(id),
+ 	foreign key (id_ataque_1) references ataque(id_ataque),
+ 	foreign key (id_ataque_2) references ataque(id_ataque),
+ 	foreign key (nombre_usuario) references usuario(nombre_usuario)
+)
+
+CREATE TABLE combate(
+	id_combate int primary key,
+	nombre_usuario_1 text not null,
+	nombre_usuario_2 text not null,
+	
+	foreign key (nombre_usuario_1) references usuario(nombre_usuario),
+	foreign key (nombre_usuario_2) references usuario(nombre_usuario)
+)
+
+CREATE TABLE estadistica(
+	id_estadistica serial primary key,
+	nombre_usuario text not null,
+	id_combate int not null, 
+	gano_s_n bool not null,
+	
+	foreign key (nombre_usuario) references usuario(nombre_usuario),
+	foreign key (id_combate) references combate(id_combate)
+)
+
+CREATE TABLE creatudex(
+	id int primary key,
+	id_especie int not null,
+	nombre_usuario text not null,
+	
+	foreign key (id_especie) references especie(id),
+	foreign key (nombre_usuario) references usuario(nombre_usuario)
+)

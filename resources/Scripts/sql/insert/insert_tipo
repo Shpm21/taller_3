@@ -1,0 +1,10 @@
+INSERT INTO public.tipo(
+	id, nombre, fortaleza, debilidad)
+	VALUES 
+	(1, 'agua', 'fuego', 'eléctrico'),
+	(2, 'fuego', 'planta', 'agua'),
+	(3, 'tierra', 'eléctrico', 'planta'),
+	(4, 'planta', 'agua', 'fuego'),
+	(5, 'dragón', 'dragon', 'metal'),
+	(6, 'eléctrico', 'agua', 'tierra'),
+	(7, 'metal','dragon', 'tierra')

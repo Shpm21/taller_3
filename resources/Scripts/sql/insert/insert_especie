@@ -1,0 +1,42 @@
+INSERT INTO public.especie(
+	id, nombre, id_tipo_1)
+	VALUES 
+(1, 'Escuero', 1),
+(2, 'Saydock', 1),
+(3, 'Poliwah', 1),
+(4, 'Charmender', 2),
+(5, 'Groulait', 2),
+(6, 'Ponita', 2),
+(7, 'Cubon', 3),
+(8, 'Sandreu', 3),
+(9, 'Diglet', 3),
+(10, 'Tangla', 4),
+(11, 'Chikogrita', 4),
+(12, 'Sonflore', 4),
+(13, 'Dragonair', 5),
+(14, 'Bago', 5),
+(15, 'Axyu', 5),
+(16, 'Pikochu', 6),
+(17, 'Elektrabuss', 6),
+(18, 'Yolteon', 6),
+(19, 'Cklink', 7),
+(20, 'Mental', 7),
+(21, 'Kuflant', 7)
+
+INSERT INTO public.especie(
+	id, nombre, id_tipo_1, id_tipo_2)
+	VALUES 
+(22, 'Kindra', 1,5),
+(23, 'Krakovish', 1,5),
+(24, 'Roton', 2,6),
+(25, 'Vitini', 2,6),
+(26, 'Tortera', 3,4),
+(27, 'Camptor', 3,4),
+(28, 'Arkind', 4,2),
+(29, 'Flortoe', 4,2),
+(30, 'Ckron', 5,6),
+(31, 'Malkia', 5,6),
+(32, 'Magnemait', 6,7),
+(33, 'Togedranu', 6,7),
+(34, 'Empollio', 7,1),
+(35, 'Jiatran', 7,1)
