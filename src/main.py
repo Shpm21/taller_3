@@ -6,6 +6,12 @@ from random import randint
 connect = Connection()
 
 
+def generar_id() -> int:
+    n1 = str(randint(1,100))
+    n2 = str(randint(1,100))
+    n3 = str(randint(1,100))
+    return int(n1+n2+n3)
+
 def validar_fecha(fecha_de_nacimiento: str) -> bool:
     valido = True
     fecha = fecha_de_nacimiento.split('/')
@@ -20,7 +26,7 @@ def validar_fecha(fecha_de_nacimiento: str) -> bool:
         valido = False
     return valido
 
-def registro_usuario() -> bool: #CAMBIAR ESTO
+def registro_usuario() -> bool:
     nombre_usuario = input('Para salir del menu de registro ingresa ''Fin''\nNombre de usuario: ')
     if nombre_usuario == 'Fin':
         return False
@@ -49,14 +55,64 @@ def login() -> Usuario:
         raise Exception('La contraseña ingresada es incorrecta')
     return usuario
 
-def atrapar_especie(usuario: Usuario, especie: Especie):
+
+def reemplazar_creatura(usuario: Usuario, creatura: Creatura) -> bool:
+    equipo = connect.obtener_equipo(usuario.nombre_usuario)
+    if equipo:
+        #DATOS DE EQUIPO
+        for i in range(len(equipo)):
+            cant = i+1
+            print(f'[{cant}] {equipo[i].especie.nombre_especie}')
+        eleccion = input('Ingresa el indice de la creatura a reemplazar:\n')
+        creatura_reemplazada = equipo[int(eleccion)-1]
+        return connect.reemplazar_creatura(creatura, creatura_reemplazada.id_creatura)
+
+def atrapar_especie(usuario: Usuario, especie: Especie) -> None: #SIMPLIFICAR ESTE METODO
     #60% de prob de atraparlo, 40% de que huya
     probabilidad = randint(1, 100)
     if 0 < probabilidad <= 60:
+        salud = randint(100,150)
+        velocidad = randint(30,90)
+        cantidad_ataques = randint(1,2)
+        id_creatura = generar_id()
+        creatura = Creatura(id_creatura, salud, velocidad)
+        creatura.especie = especie
+        creatura.nombre_usuario = usuario.nombre_usuario
+        if creatura.especie.tipo_2 != None:
+            if cantidad_ataques == 1:
+                creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
+            else:
+                creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
+                creatura.ataque_2 = connect.obtener_ataque_creatura(especie.tipo_2.id)
+        else:
+            creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
         #ACA QUEDE
-        print('Atrapa')
+        print(f'Has atrapado un {especie.nombre_especie}\nPS: {salud}\nPV: {velocidad}\nAtaques:')
+        if creatura.ataque_2 != None:
+            print(f'Ataque 1:\n{creatura.ataque_1.__str__()}')
+            print(f'Ataque 2:\n{creatura.ataque_2.__str__()}')
+        else:
+            print(f'Ataque 1:\n{creatura.ataque_1.__str__()}')
+
+        id_creatudex = generar_id()
+        if connect.verificar_especie_creatudex(especie.id):
+            print('Ya tienes esta creatura registrada en tu creatudex')
+        else:
+            while not connect.registrar_en_creatudex(id_creatudex, especie.id, usuario.nombre_usuario):
+                id_creatudex = generar_id()
+        opcion = input('¿Deseas agregarlo a tu equipo?\n[1] Agregar al equipo [2] Transferir\n')
+        if opcion == '1':
+            if connect.obtener_cantidad_creaturas(usuario.nombre_usuario) < 6:
+                while not connect.registrar_creatura(creatura):
+                    creatura.id_creatura = generar_id()
+            else:
+                if reemplazar_creatura(usuario, creatura):
+                    print('Se ha realizado un cambio en el equipo')            
+            print('Creatura añadida con exito al equipo')
+        else:
+            print('Creatura transferida')
     else:
-        print('Huye')
+        print('La creatura ha huido')
 
 def expedicion(usuario: Usuario):
     especie = connect.obtener_especie_aleatoria()
@@ -65,6 +121,7 @@ def expedicion(usuario: Usuario):
         decision = input('[1] Atrapar especie\n[2] Escapar\n[3] Salir de la expedicion\n')
         if decision == '1':
             atrapar_especie(usuario, especie)
+            especie = connect.obtener_especie_aleatoria()
         elif decision == '2':
             especie = connect.obtener_especie_aleatoria()
         elif decision == '3':
@@ -140,5 +197,6 @@ def main():
                 print('Se ha registrado correctamente')
             else:
                 print('No se ha podido registrar')
+    connect.terminar_conexion()
     
 main()
