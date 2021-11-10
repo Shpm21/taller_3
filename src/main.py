@@ -1,5 +1,8 @@
+from especie.Especie import Especie
 from sql.Connection import Connection
 from usuario.Usuario import Usuario
+from creatura.Creatura import Creatura
+from random import randint
 connect = Connection()
 
 
@@ -35,21 +38,85 @@ def registro_usuario() -> bool: #CAMBIAR ESTO
             return False
     return True
 
-def login():
+def login() -> Usuario:
     nombre_usuario = input('Nombre de usuario: ')
     if not connect.buscar_usuario(nombre_usuario):
         raise Exception('Error al iniciar sesion\nEl nombre de usuario ingresado no existe en el sistema\n')
 
     contrasena = input('Contraseña: ')
-    datos_usuario = connect.verificar_contrasena(nombre_usuario, contrasena)
-    if datos_usuario:
-        for u in datos_usuario:
-            usuario = Usuario(u[0], u[1], u[2], u[3], u[4], u[5])
-        return usuario
+    usuario = connect.obtener_usuario(nombre_usuario, contrasena)
+    if not usuario:
+        raise Exception('La contraseña ingresada es incorrecta')
+    return usuario
 
-    raise Exception('Error al iniciar sesion\nLa contraseña ingresada es incorrecta\n')
+def atrapar_especie(usuario: Usuario, especie: Especie):
+    #60% de prob de atraparlo, 40% de que huya
+    probabilidad = randint(1, 100)
+    if 0 < probabilidad <= 60:
+        #ACA QUEDE
+        print('Atrapa')
+    else:
+        print('Huye')
 
-def menu_inicio() -> int:
+def expedicion(usuario: Usuario):
+    especie = connect.obtener_especie_aleatoria()
+    while True:
+        print(especie.__str__())
+        decision = input('[1] Atrapar especie\n[2] Escapar\n[3] Salir de la expedicion\n')
+        if decision == '1':
+            atrapar_especie(usuario, especie)
+        elif decision == '2':
+            especie = connect.obtener_especie_aleatoria()
+        elif decision == '3':
+            break
+        else:
+            print('La opcion ingresada no es valida')
+
+def equipo_lucha(usuario: Usuario):
+    try:
+        equipo = connect.obtener_equipo(usuario.nombre_usuario)
+        if equipo:
+            #DATOS DE EQUIPO
+            for e in equipo:
+                print(e.__str__() + '\n')
+            #DATOS DE ESTADISTICAS
+            print(f'Cantidad de peleas en las que ha participado: {connect.cantidad_peleas_totales(usuario.nombre_usuario)}')
+            print(f'Cantidad de peleas en las que ha ganado: {connect.cantidad_peleas_ganadas(usuario.nombre_usuario)}')
+            print(f'Cantidad de peleas en las que ha perdido: {connect.cantidad_peleas_perdidas(usuario.nombre_usuario)}')
+    except Exception as e:
+        print(e)
+
+def creatudex(usuario: Usuario):
+    especies = connect.buscar_especies(usuario.nombre_usuario)
+    if especies:
+        for e in especies:
+            print(e)
+    else:
+        print('El usuario no tiene especies capturadas')
+
+def menu_usuario(usuario: Usuario):
+    print(f'Nombre usuario: {usuario.nombre_usuario}')
+    while True:
+        opcion = opciones_usuario()
+        if opcion == 5:
+            break
+        if opcion == 1:
+            creatudex(usuario)
+        if opcion == 2:
+            equipo_lucha(usuario)
+        if opcion == 3:
+            expedicion(usuario)
+        if opcion == 4:
+            pass
+
+def opciones_usuario() -> int:
+    try:
+        opcion =  int(input('Elige una de las siguientes opciones\n[1] Creatudex\n[2] Equipo Lucha\n[3] Expedición\n[4] Lucha\n[5] Cerrar Sesión\n'))
+        return opcion
+    except ValueError:
+        print('La opcion ingresada no es valida\n')
+
+def opciones_inicio() -> int:
     try:
         opcion =  int(input('Bienvenido!!\nElige una de las siguientes opciones\n[1] Iniciar Sesion\n[2] Registrarse\n[3] Salir\n'))
         return opcion
@@ -58,13 +125,14 @@ def menu_inicio() -> int:
 
 def main():
     while True:
-        opcion = menu_inicio()
+        opcion = opciones_inicio()
         if opcion == 3:
             break
         elif opcion == 1:
             try:
                 usuario = login()
-                print('Acceso correcto')
+                print('Acceso correcto\n')
+                menu_usuario(usuario)
             except Exception as e:
                 print(e)
         elif opcion == 2:
