@@ -46,7 +46,7 @@ class Connection:
             usuario = Usuario(datos_usuario[0], datos_usuario[1], datos_usuario[2], datos_usuario[3], datos_usuario[4], datos_usuario[5])
             return usuario
         except Exception as e:
-            print(e, 'a1')
+            print(e)
 
     def buscar_especies(self, nombre_usuario: str) -> list:
         try:

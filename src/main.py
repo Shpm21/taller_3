@@ -55,7 +55,6 @@ def login() -> Usuario:
         raise Exception('La contraseña ingresada es incorrecta')
     return usuario
 
-
 def reemplazar_creatura(usuario: Usuario, creatura: Creatura) -> bool:
     equipo = connect.obtener_equipo(usuario.nombre_usuario)
     if equipo:
@@ -105,10 +104,10 @@ def atrapar_especie(usuario: Usuario, especie: Especie) -> None: #SIMPLIFICAR ES
             if connect.obtener_cantidad_creaturas(usuario.nombre_usuario) < 6:
                 while not connect.registrar_creatura(creatura):
                     creatura.id_creatura = generar_id()
+                print('Creatura añadida con exito al equipo')
             else:
                 if reemplazar_creatura(usuario, creatura):
                     print('Se ha realizado un cambio en el equipo')            
-            print('Creatura añadida con exito al equipo')
         else:
             print('Creatura transferida')
     else:
