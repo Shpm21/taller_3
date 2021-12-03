@@ -1,5 +1,7 @@
 from ataque.Ataque import Ataque
+from combate.Combate import Combate
 from creatura.Creatura import Creatura
+from estadistica.Estadistica import Estadistica
 from tipo.Tipo import Tipo
 from usuario.Usuario import Usuario
 from especie.Especie import Especie
@@ -123,15 +125,14 @@ class Connection:
                 WHERE cr.nombre_usuario = %s', (nombre_usuario,))
             equipo = []
             creaturas = self.cur.fetchall()
-            if not creaturas:
-                return
-            for c in creaturas:
-                creatura = Creatura(c[0], c[1], c[2])
-                creatura.especie = self.buscar_especie(c[3])
-                creatura.ataque_1 = self.buscar_ataque(c[4])
-                if c[5] != None:
-                    creatura.ataque_2 = self.buscar_ataque(c[5])
-                equipo.append(creatura)
+            if creaturas:
+                for c in creaturas:
+                    creatura = Creatura(c[0], c[1], c[2])
+                    creatura.especie = self.buscar_especie(c[3])
+                    creatura.ataque_1 = self.buscar_ataque(c[4])
+                    if c[5] != None:
+                        creatura.ataque_2 = self.buscar_ataque(c[5])
+                    equipo.append(creatura)
             return equipo
         except Exception as e:
             print(e)
@@ -177,9 +178,9 @@ class Connection:
 
     def obtener_ataque_creatura(self, id_tipo: int) -> Ataque:
         try:
-            self.cur.execute('SELECT id_ataque, nombre, dano_base, tipo from ataque \
-                where tipo = %s \
-                order by random() limit 1 ', (id_tipo,))
+            self.cur.execute('SELECT id_ataque, nombre, dano_base, tipo FROM ataque \
+                WHERE tipo = %s \
+                ORDER BY random() limit 1 ', (id_tipo,))
             datos_ataque = self.cur.fetchone()
             ataque = Ataque(datos_ataque[0], datos_ataque[1], datos_ataque[2])
             ataque.tipo = self.buscar_tipo(datos_ataque[3])
@@ -214,6 +215,7 @@ class Connection:
             return False
         except Exception as e:
             print(e)
+
     def registrar_en_creatudex(self, id: int, id_especie: int, nombre_usuario: str) -> bool:
         try:
             self.cur.execute('INSERT INTO creatudex (id, id_especie, nombre_usuario) VALUES (%s, %s, %s)', (id, id_especie, nombre_usuario))
@@ -254,5 +256,37 @@ class Connection:
         except Exception:
             return False
         
+    def obtener_oponente(self, nombre_usuario: str):
+        try:
+            self.cur.execute('SELECT * FROM usuario \
+                WHERE nombre_usuario != %s \
+                ORDER BY random() limit 1 ', (nombre_usuario,))
+            datos_usuario = self.cur.fetchone()
+            if not datos_usuario:
+                return
+            usuario = Usuario(datos_usuario[0], datos_usuario[1], datos_usuario[2], datos_usuario[3], datos_usuario[4], datos_usuario[5])
+            return usuario
+        except Exception as e:
+            print(e)
+
+    def insertar_combate(self, combate: Combate) -> bool:
+        try:
+            self.cur.execute('INSERT INTO combate (id_combate, nombre_usuario_1, nombre_usuario_2) VALUES (%s, %s, %s)', (combate.id, combate.usuario1.nombre_usuario, combate.usuario2.nombre_usuario))
+            self.con.commit()
+            return True
+        except Exception:
+            self.con.rollback()
+            return False
+
+    def insertar_estadistica(self, estadistica: Estadistica) -> bool:
+        try:
+            self.cur.execute('INSERT INTO estadistica (id_estadistica, nombre_usuario, id_combate, gano_s_n) \
+            VALUES (%s, %s, %s, %s)', (estadistica.id, estadistica.usuario.nombre_usuario, estadistica.combate.id, estadistica.resultado))
+            self.con.commit()
+            return True
+        except Exception:
+            self.con.rollback()
+            return False
+
     def terminar_conexion(self):
         self.con.close()

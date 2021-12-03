@@ -11,9 +11,3 @@ class Usuario:
         self.contrasena = contrasena
         self.fecha_de_nacimiento = fecha_de_nacimiento
         self.edad = edad
-    
-    def capturar(especie: Especie):
-        pass
-
-    def anadir_equipo(creatura: Creatura):
-        pass

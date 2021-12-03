@@ -1,4 +1,7 @@
+from math import e
+from combate.Combate import Combate
 from especie.Especie import Especie
+from estadistica.Estadistica import Estadistica
 from sql.Connection import Connection
 from usuario.Usuario import Usuario
 from creatura.Creatura import Creatura
@@ -10,7 +13,8 @@ def generar_id() -> int:
     n1 = str(randint(1,100))
     n2 = str(randint(1,100))
     n3 = str(randint(1,100))
-    return int(n1+n2+n3)
+    n4 = str(randint(1,100))
+    return int(n1+n2+n3+n4)
 
 def validar_fecha(fecha_de_nacimiento: str) -> bool:
     valido = True
@@ -18,13 +22,68 @@ def validar_fecha(fecha_de_nacimiento: str) -> bool:
     if len(fecha) == 3:
         dia = int(fecha[0])
         mes = int(fecha[1])
-        if dia <= 31 and dia > 0 and mes > 0 and mes <= 12:
-            valido = True
-        else:
-            valido = False
+        valido = True if dia <= 31 and dia > 0 and mes > 0 and mes <= 12 else False
     else:
         valido = False
     return valido
+
+def cantidad_maxima(cantidad_c_u: int, cantidad_c_o: int) -> int:
+    return cantidad_c_u if cantidad_c_u >= cantidad_c_o else cantidad_c_o
+
+def combate_jugadores(creatura_usuario: Creatura, creatura_oponente: Creatura) -> bool:
+    print(f'Creaturas en combate: {creatura_usuario.especie.nombre_especie} PS: {creatura_usuario.salud} vs \
+        {creatura_oponente.especie.nombre_especie} PS: {creatura_oponente.salud}')
+    comienza = 1 if creatura_usuario.velocidad > creatura_oponente.velocidad else 2
+    while True:
+        if creatura_usuario.k_o():
+            print(f'{creatura_oponente.especie.nombre_especie} Ha ganado')
+            return False
+        if creatura_oponente.k_o():
+            print(f'{creatura_usuario.especie.nombre_especie} Ha ganado')
+            return True
+        if comienza == 1:
+            creatura_usuario.atacar(creatura_oponente)
+            comienza = 2
+        elif comienza == 2:
+            creatura_oponente.atacar(creatura_usuario)
+            comienza = 1
+
+def lucha(usuario: Usuario):
+    equipo = connect.obtener_equipo(usuario.nombre_usuario)
+    oponente: Usuario = connect.obtener_oponente(usuario.nombre_usuario)
+    equipo_oponente = connect.obtener_equipo(oponente.nombre_usuario)
+    cantidad_c_u = len(equipo)
+    cantidad_c_o = len(equipo_oponente)
+    cantidad_ganadas_jugador = 0
+    cantidad_ganadas_oponente = 0
+    estadistica_usuario = None
+    estadistica_oponente = None
+    if not equipo or not equipo_oponente:
+        raise Exception(f'No se ha podido llevar a cabo la batalla debido a que uno de los jugadores no tiene creaturas capturadas')
+    combate = Combate(generar_id, usuario, oponente)
+    while not connect.insertar_combate(combate):
+        combate.id = generar_id()
+    print(f'Jugadores: {usuario.nombre_usuario} vs {oponente.nombre_usuario}')
+    for i in range(cantidad_maxima(cantidad_c_u, cantidad_c_o)):
+        if combate_jugadores(equipo[i], equipo_oponente[i]):
+            cantidad_ganadas_jugador += 1
+        else:
+            cantidad_ganadas_oponente += 1
+    if cantidad_ganadas_jugador > cantidad_ganadas_oponente:
+        print(f'Felicidades {usuario.nombre_usuario} has ganado la batalla')
+        estadistica_usuario = Estadistica(generar_id(), usuario, combate, True)
+        estadistica_oponente = Estadistica(generar_id(), oponente, combate, False)
+    else:
+        print(f'{oponente.nombre_usuario} ha ganado la batalla')
+        estadistica_usuario = Estadistica(generar_id(), usuario, combate, False)
+        estadistica_oponente = Estadistica(generar_id(), oponente, combate, True)
+    if estadistica_usuario and estadistica_oponente:
+        while not connect.insertar_estadistica(estadistica_usuario):
+            estadistica_usuario.id = generar_id()
+        while not connect.insertar_estadistica(estadistica_oponente):
+            estadistica_oponente.id = generar_id()
+
+
 
 def registro_usuario() -> bool:
     nombre_usuario = input('Para salir del menu de registro ingresa ''Fin''\nNombre de usuario: ')
@@ -163,7 +222,10 @@ def menu_usuario(usuario: Usuario):
         if opcion == 3:
             expedicion(usuario)
         if opcion == 4:
-            pass
+            try:
+                lucha(usuario)
+            except Exception as e:
+                print(e)
 
 def opciones_usuario() -> int:
     try:
