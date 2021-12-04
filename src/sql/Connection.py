@@ -513,9 +513,8 @@ class Connection:
                     creatura.ataque_2.id_ataque, creatura.salud, creatura.velocidad, id_creatura))
                 return True
             else:
-                self.cur.execute('UPDATE creatura SET id_especie = %s, id_ataque_1 = %s, id_ataque_2 = %s, salud = %s, velocidad = %s \
-                    WHERE id_creatura = %s', (creatura.especie.id, creatura.ataque_1.id_ataque,
-                    'NULL', creatura.salud, creatura.velocidad, id_creatura))
+                self.cur.execute('UPDATE creatura SET id_especie = %s, id_ataque_1 = %s, salud = %s, velocidad = %s \
+                    WHERE id_creatura = %s', (creatura.especie.id, creatura.ataque_1.id_ataque, creatura.salud, creatura.velocidad, id_creatura))
                 return True
         except Exception:
             return False

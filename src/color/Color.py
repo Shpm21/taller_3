@@ -1,0 +1,7 @@
+HEADER = '\033[95m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+ENDC = '\033[0m'
+WARNING = '\033[91m'
+WBLUE = '\033[96m'

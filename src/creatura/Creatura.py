@@ -23,9 +23,7 @@ class Creatura():
             if ataque_elegido == 1:
                 dano_final = self.calcular_dano(self.ataque_1, enemigo)
             else:
-                dano_final = self.calcular_dano(self.ataque_2, enemigo)  
-        """if ataqueUsado is not None:
-            print(f'{self.especie.nombre_especie} Ha atacado con {ataqueUsado.nombre} Y ha realizado un daño de: {dano_final}') """
+                dano_final = self.calcular_dano(self.ataque_2, enemigo)
         enemigo.salud -= dano_final
     
     def calcular_dano(self, ataque: Ataque, enemigo):
