@@ -11,9 +11,9 @@ import psycopg2
 class Connection:
     def __init__(self):
         try:
-            self.con = psycopg2.connect(host='localhost', database='taller_3', user='postgres', password='-V4c3x2z')
+            self.con = psycopg2.connect(host='localhost', database='fakemon-db', user='postgres', password='-V4c3x2z1')
             self.cur = self.con.cursor()
-        except Exception as e:
+        except Exception:
             print('No se ha podido conectar con la base de datos')
 
     def insertar_usuario(self, usuario: Usuario) -> bool:
@@ -23,7 +23,6 @@ class Connection:
         ----------
         usuario: `Usuario`
             Usuario el cual sera insertado en la base de datos.
-        
         Returns
         -------
         `True`
@@ -214,8 +213,8 @@ class Connection:
         """
         try:
             self.cur.execute('SELECT count(*) from creatura cr WHERE cr.nombre_usuario = %s', (nombre_usuario,))
-            cantidad = self.cur.fetchone()
-            return cantidad[0]
+            cantidad = self.cur.fetchone()[0]
+            return cantidad
         except Exception as e:
             print(e)
 
@@ -226,7 +225,6 @@ class Connection:
         ----------
         nombre_usuario: `str`
             Nombre del usuario el cual se le buscara las creaturas.
-
         Returns
         -------
         equipo: `list[Creatura]`
@@ -292,8 +290,8 @@ class Connection:
         """
         try:
             self.cur.execute('SELECT count(*) FROM estadistica WHERE nombre_usuario = %s and gano_s_n = true', (nombre_usuario,))
-            cantidad = self.cur.fetchone()
-            return cantidad[0]
+            cantidad = self.cur.fetchone()[0]
+            return cantidad
         except Exception as e:
             print(e)
 
@@ -313,8 +311,8 @@ class Connection:
         """
         try:
             self.cur.execute('SELECT count(*) FROM estadistica WHERE nombre_usuario = %s and gano_s_n = false', (nombre_usuario,))
-            cantidad = self.cur.fetchone()
-            return cantidad[0]
+            cantidad = self.cur.fetchone()[0]
+            return cantidad
         except Exception as e:
             print(e)
 
@@ -377,8 +375,8 @@ class Connection:
         """
         try:
             self.cur.execute('SELECT count(*) FROM especie')
-            cantidad = self.cur.fetchone()
-            return cantidad[0]
+            cantidad = self.cur.fetchone()[0]
+            return cantidad
         except Exception as e:
             print(e)
 
@@ -398,8 +396,8 @@ class Connection:
         """
         try:
             self.cur.execute('SELECT count(*) FROM creatudex WHERE nombre_usuario = %s', (usuario.nombre_usuario,))
-            cantidad = self.cur.fetchone()
-            return cantidad[0]
+            cantidad = self.cur.fetchone()[0]
+            return cantidad
         except Exception as e:
             print(e)
 

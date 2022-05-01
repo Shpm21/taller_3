@@ -2,11 +2,7 @@ from random import randint
 
 
 def generar_id() -> int:
-    n1 = str(randint(1,100))
-    n2 = str(randint(1,100))
-    n3 = str(randint(1,100))
-    n4 = str(randint(1,100))
-    return int(n1+n2+n3+n4)
+    return int(''.join([str(randint(1, 100)) for i in range(4)]))
 
 def validar_fecha(fecha_de_nacimiento: str) -> bool:
     valido = True

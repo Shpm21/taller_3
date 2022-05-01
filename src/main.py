@@ -12,6 +12,7 @@ from random import randint
 
 connect = Connection()
 
+
 def combate_jugadores(creatura_usuario: Creatura, creatura_oponente: Creatura) -> bool:
     print(f'{WBLUE}Creaturas en combate: {creatura_usuario.especie.nombre_especie} PS: {creatura_usuario.salud} vs {creatura_oponente.especie.nombre_especie} PS: {creatura_oponente.salud}{ENDC}')
     comienza = 1 if creatura_usuario.velocidad > creatura_oponente.velocidad else 2
@@ -29,6 +30,7 @@ def combate_jugadores(creatura_usuario: Creatura, creatura_oponente: Creatura) -
             creatura_oponente.atacar(creatura_usuario)
             comienza = 1
 
+
 def definir_ganador(cantidad_ganadas_jugador: int, cantidad_ganadas_oponente: int, usuario: Usuario, oponente: Usuario, combate: Combate):
     estadistica_usuario = None
     estadistica_oponente = None
@@ -45,6 +47,7 @@ def definir_ganador(cantidad_ganadas_jugador: int, cantidad_ganadas_oponente: in
             estadistica_usuario.id = generar_id()
         while not connect.insertar_estadistica(estadistica_oponente):
             estadistica_oponente.id = generar_id()
+
 
 def lucha(usuario: Usuario):
     equipo = connect.obtener_equipo(usuario.nombre_usuario)
@@ -64,7 +67,7 @@ def lucha(usuario: Usuario):
         if combate_jugadores(equipo[i], equipo_oponente[i]):
             cantidad_ganadas_jugador += 1
         else:
-            cantidad_ganadas_oponente += 1  
+            cantidad_ganadas_oponente += 1
     definir_ganador(cantidad_ganadas_jugador, cantidad_ganadas_oponente, usuario, oponente, combate)
 
 def registro_usuario() -> bool:
@@ -87,6 +90,7 @@ def registro_usuario() -> bool:
         usuario.nombre_usuario = nombre_usuario
     return True
 
+
 def login() -> Usuario:
     nombre_usuario = input(WBLUE + 'Nombre de usuario: ' + ENDC)
     if not connect.buscar_usuario(nombre_usuario):
@@ -98,35 +102,37 @@ def login() -> Usuario:
         raise Exception(WARNING + 'La contraseña ingresada es incorrecta' + ENDC)
     return usuario
 
+
 def reemplazar_creatura(usuario: Usuario, creatura: Creatura) -> bool:
     equipo = connect.obtener_equipo(usuario.nombre_usuario)
     if equipo:
         for i in range(len(equipo)):
-            cant = i+1
+            cant = i + 1
             print(f'{YELLOW}[{cant}] {equipo[i].especie.nombre_especie}{ENDC}')
 
         eleccion = input(WBLUE + 'Ingresa el indice de la creatura a reemplazar:\n' + ENDC)
 
-        creatura_reemplazada = equipo[int(eleccion)-1]
-        return connect.reemplazar_creatura(creatura, creatura_reemplazada.id_creatura)
 
 def obtener_ataques(creatura: Creatura, especie: Especie):
-    cantidad_ataques = randint(1,2)
-    if creatura.especie.tipo_2 != None:
+    cantidad_ataques = randint(1, 2)
+    if creatura.especie.tipo_2 is not None:
         if cantidad_ataques == 1:
-            creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
+            creatura.ataque_1 = connect.obtener_ataque_creatura(
+                especie.tipo_1.id)
         else:
             creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
             creatura.ataque_2 = connect.obtener_ataque_creatura(especie.tipo_2.id)
     else:
         creatura.ataque_1 = connect.obtener_ataque_creatura(especie.tipo_1.id)
 
+
 def registrar_especie_creatura(usuario: Usuario, especie: Especie, creatura: Creatura):
     id_creatudex = generar_id()
     if connect.verificar_especie_creatudex(especie.id):
         print(f'{YELLOW}Ya tienes esta creatura registrada en tu creatudex{ENDC}')
     else:
-        while not connect.registrar_en_creatudex(id_creatudex, especie.id, usuario.nombre_usuario):
+        while not connect.registrar_en_creatudex(
+                id_creatudex, especie.id, usuario.nombre_usuario):
             id_creatudex = generar_id()
     opcion = input(WBLUE + '¿Deseas agregarlo a tu equipo?\n[1] Agregar al equipo [2] Transferir\n' + ENDC)
     if opcion == '1':
@@ -136,24 +142,24 @@ def registrar_especie_creatura(usuario: Usuario, especie: Especie, creatura: Cre
             print(f'{YELLOW}Creatura añadida con exito al equipo{ENDC}')
         else:
             if reemplazar_creatura(usuario, creatura):
-                print(f'{YELLOW}Se ha realizado un cambio en el equipo{ENDC}')            
+                print(f'{YELLOW}Se ha realizado un cambio en el equipo{ENDC}')
     else:
         print(f'{YELLOW}Creatura transferida{ENDC}')
 
-def atrapar_especie(usuario: Usuario, especie: Especie) -> None: #SIMPLIFICAR ESTE METODO
-    #60% de prob de atraparlo, 40% de que huya
+
+def atrapar_especie(usuario: Usuario, especie: Especie) -> None:  # SIMPLIFICAR ESTE METODO
+    # 60% de prob de atraparlo, 40% de que huya
     probabilidad = randint(1, 100)
     if 0 < probabilidad <= 60:
-        salud = randint(100,150)
-        velocidad = randint(30,90)
-
+        salud = randint(100, 150)
+        velocidad = randint(30, 90)
         id_creatura = generar_id()
         creatura = Creatura(id_creatura, salud, velocidad)
         creatura.especie = especie
         creatura.nombre_usuario = usuario.nombre_usuario
         obtener_ataques(creatura, especie)
         print(f'{YELLOW}Has atrapado un {especie.nombre_especie}\nPS: {salud}\nPV: {velocidad}\nAtaques:{ENDC}')
-        if creatura.ataque_2 != None:
+        if creatura.ataque_2 is not None:
             print(f'{WBLUE}Ataque 1:\n{creatura.ataque_1.__str__()}{ENDC}')
             print(f'{WBLUE}Ataque 2:\n{creatura.ataque_2.__str__()}{ENDC}')
         else:
@@ -161,6 +167,7 @@ def atrapar_especie(usuario: Usuario, especie: Especie) -> None: #SIMPLIFICAR ES
         registrar_especie_creatura(usuario, especie, creatura)
     else:
         print(f'{YELLOW}La creatura ha huido{ENDC}')
+
 
 def expedicion(usuario: Usuario):
     especie = connect.obtener_especie_aleatoria()
@@ -177,18 +184,20 @@ def expedicion(usuario: Usuario):
         else:
             print(f'{WARNING}La opcion ingresada no es valida{ENDC}')
 
+
 def equipo_lucha(usuario: Usuario):
     equipo = connect.obtener_equipo(usuario.nombre_usuario)
     if equipo:
-        #DATOS DE EQUIPO
+        # DATOS DE EQUIPO
         for e in equipo:
             print(f'{WBLUE}{e.__str__() }\n{ENDC}')
-        #DATOS DE ESTADISTICAS
+        # DATOS DE ESTADISTICAS
         print(f'{WBLUE}Cantidad de peleas en las que ha participado:{ENDC} {YELLOW}{connect.cantidad_peleas_totales(usuario.nombre_usuario)}{ENDC}')
         print(f'{WBLUE}Cantidad de peleas en las que ha ganado:{ENDC} {YELLOW}{connect.cantidad_peleas_ganadas(usuario.nombre_usuario)}{ENDC}')
         print(f'{WBLUE}Cantidad de peleas en las que ha perdido:{ENDC} {YELLOW}{connect.cantidad_peleas_perdidas(usuario.nombre_usuario)}{ENDC}')
     else:
         print(f'{YELLOW}El jugador no tiene creaturas capturadas{ENDC}')
+
 
 def creatudex(usuario: Usuario):
     especies = connect.buscar_especies(usuario.nombre_usuario)
@@ -199,6 +208,7 @@ def creatudex(usuario: Usuario):
         print(f'{YELLOW}El usuario no tiene especies capturadas{ENDC}')
     print(f'{WBLUE}La cantidad de especies que ha capturado hasta el momento es de:{ENDC} {YELLOW}{connect.obtener_cantidad_creatudex(usuario)}{ENDC}')
     print(f'{WBLUE}La cantidad de especies que nos falta por descubrir es de:{ENDC} {YELLOW}{connect.obtener_cantidad_especies()}{ENDC}')
+
 
 def menu_usuario(usuario: Usuario):
     print(f'{BLUE}Nombre usuario: {usuario.nombre_usuario}{ENDC}')
@@ -218,6 +228,7 @@ def menu_usuario(usuario: Usuario):
             except Exception as e:
                 print(e)
 
+
 def opciones_usuario() -> int:
     try:
         opcion =  int(input(HEADER + 'Elige una de las siguientes opciones\n' + WBLUE +'[1] Creatudex\n[2] Equipo Lucha\n[3] Expedición\n[4] Lucha\n[5] Cerrar Sesión\n' + ENDC + HEADER + 'Opción: ' + ENDC))
@@ -225,12 +236,14 @@ def opciones_usuario() -> int:
     except ValueError:
         print(f'{WARNING}La opción ingresada no es válida\n {ENDC}')
 
+
 def opciones_inicio() -> int:
     try:
         opcion =  int(input(HEADER + 'Bienvenido!!\nElige una de las siguientes opciones\n' + WBLUE + '[1] Iniciar Sesion\n[2] Registrarse\n[3] Salir\n' + ENDC + HEADER + 'Opción: ' + ENDC))
         return opcion
     except ValueError:
         print(f'{WARNING}La opción ingresada no es válida\n {ENDC}')
+
 
 def main():
     while True:
@@ -250,5 +263,6 @@ def main():
             else:
                 print('No se ha podido registrar')
     connect.terminar_conexion()
-    
+
+
 main()

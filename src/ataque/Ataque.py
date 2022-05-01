@@ -2,7 +2,8 @@ from tipo.Tipo import Tipo
 
 
 class Ataque:
-    def __init__(self, id_ataque: int, nombre: str, dano_base: int):
+    def __init__(self, id_ataque: int, nombre: str,
+                 dano_base: int):
         self.id_ataque = id_ataque
         self.nombre = nombre
         self.dano_base = dano_base
